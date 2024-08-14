@@ -39,7 +39,7 @@ void select(int input, int &nr_client)
         {
             cout << "Name of customer: ";
             cin >> customer.name[nr_client];
-            cout << "Personal Number: ";
+            cout << "Age: ";
             cin >> customer.age[nr_client];
             type.model_owner[nr_client] = bike.model[input];
             nr_client++;
