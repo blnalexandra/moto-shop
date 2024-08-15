@@ -2,6 +2,6 @@
 2. Lista clientilor si ce au cumparat
 3. Informatii despre motociclete
 4. Sortare dupa pret
-5. Fiecare model aee un stoc
+5. Fiecare model are un stoc
 6.  Parola este abcd123
   
