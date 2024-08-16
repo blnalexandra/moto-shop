@@ -1,104 +1,95 @@
 #include <iostream>
-#include <cstring>
+#include <string>
+#include <vector>
 using namespace std;
-int nr_client = 0;
 string pass = "abcd123";
+
 struct Bikes
 {
-    string brand[100] = {"Yamaha", "Kawasaki", "Honda", "BMW"};
-    string model[100] = {"YZF-R3", "YZF-R1", "Ninja 400", "ZX-10R", "CBR600RR", "CBR1000RR", "S1000RR", "M1000RR"};
-    string speed[100] = {"181 km/h", "284 km/h", "169 km/h", "299 km/h", "251 km/h", "346 km/h", "303 km/h", "314 km/h"};
-    int price[100] = {6000, 18000, 5000, 15000, 10000, 17000, 35000, 16000};
-    int year[100] = {2024, 2018, 2023, 2004, 2005, 2006, 2009, 2025};
-    int stock[100] = {5, 3, 7, 2, 2, 4, 3, 1};
+    std::vector<string> brand = {"Yamaha", "Kawasaki", "Honda", "BMW"};
+    std::vector<std::vector<string>> model = {{"YZF-R3", "YZF-R1"}, {"Ninja 400", "ZX-10R"}, {"CBR600RR", "CBR1000RR"}, {"S1000RR", "M1000RR"}};
+    std::vector<std::vector<string>> speed = {{"181 km/h", "284 km/h"}, {"169 km/h", "299 km/h"}, {"251 km/h", "346 km/h"}, {"303 km/h", "314 km/h"}};
+    std::vector<std::vector<int>> price = {{6000, 18000}, {5000, 15000}, {10000, 17000}, {35000, 16000}};
+    std::vector<std::vector<int>> year = {{2024, 2018}, {2023, 2004}, {2005, 2006}, {2009, 2025}};
+    std::vector<std::vector<int>> stock = {{5, 3}, {7, 2}, {2, 4}, {3, 1}};
 } bike;
 
 struct customer_info
 {
-    string name[100];
-    int age[100];
+    std::vector<string> name;
+    std::vector<int> age;
 } customer;
 
 struct purchase
 {
-    string brand_owner[100];
-    string model_owner[100];
+    std::vector<string> brand_owner;
+    std::vector<string> model_owner;
 } type;
 
-void select(int input, int &nr_client)
+void print_brand(int n)
 {
-    cout << "Select a Model: " << '\n'
-         << "1." << bike.model[input] << '\n'
-         << "2." << bike.model[input + 1];
-    int m;
-    cin >> m;
-    if (m == 1)
+    for (int i = 0; i < bike.brand.size(); ++i)
     {
-        if (bike.stock[input] > 0)
-        {
-            cout << "'This model has a top speed of " << bike.speed[input] << ", was made in year " << bike.year[input] << " and costs " << bike.price[input] << " euros. Do you wish to proceed to payment?" << '\n';
-            string choice;
-            cin >> choice;
-            if (choice == "yes")
-            {
-                int amount;
-                cout << "Amount: ";
-                cin >> amount;
-                if (bike.stock[input] - amount >= 0)
-                {
-                    cout << "Name of customer: ";
-                    cin >> customer.name[nr_client];
-                    cout << "Age: ";
-                    cin >> customer.age[nr_client];
-                    type.model_owner[nr_client] = bike.model[input];
-                    bike.stock[input] -= amount;
-                    nr_client++;
-                }
-                else
-                    cout << "Not enough in stock!" << '\n';
-            }
-        }
-        else
-            cout << "Out of stock!" << '\n';
-        return;
+        cout << "Enter " << n << " to select " << bike.brand[i] << '\n';
+        n++;
     }
+}
 
-    else if (m == 2)
+void print_model(int n, int brand)
+{
+    for (int i = 0; i < bike.model[brand - 1].size(); ++i)
     {
-        if (bike.stock[input + 1] > 0)
+        cout << "Enter " << n << " to select " << bike.model[brand - 1][i] << '\n';
+        n++;
+    }
+}
+
+void select(int brand)
+{
+    print_model(1, brand);
+    int model;
+    std::cin >> model;
+    brand--;
+    model--;
+    if (bike.stock[brand][model] > 0)
+    {
+        cout << "'This model has a top speed of " << bike.speed[brand][model] << ", was made in year " << bike.year[brand][model] << " and costs " << bike.price[brand][model] << " euros. Do you wish to proceed to payment?" << '\n';
+        string choice;
+        std::cin >> choice;
+
+        if (choice == "yes")
         {
-            cout << "'This model has a top speed of " << bike.speed[input + 1] << ", was made in year " << bike.year[input + 1] << " and costs " << bike.price[input + 1] << " euros. Do you wish to proceed to payment?" << '\n';
-            string choice;
-            cin >> choice;
-            if (choice == "yes")
+            int amount;
+            cout << "Amount: ";
+            std::cin >> amount;
+            if (bike.stock[brand][model] - amount >= 0)
             {
-                int amount;
-                cout << "Amount: ";
-                cin >> amount;
-                if (bike.stock[input + 1] - amount >= 0)
-                {
-                    cout << "Name of customer: ";
-                    cin >> customer.name[nr_client];
-                    cout << "Age: ";
-                    cin >> customer.age[nr_client];
-                    type.model_owner[nr_client] = bike.model[input + 1];
-                    bike.stock[input + 1] -= amount;
-                    nr_client++;
-                }
-                else
-                    cout << "Not enough in stock!" << '\n';
+                cout << "Name of customer: ";
+                std::string name;
+                std::cin >> name;
+                customer.name.push_back(name);
+
+                cout << "Age: ";
+                int age;
+                std::cin >> age;
+                customer.age.push_back(age);
+                std::string motor_type = bike.model[brand][model];
+                type.model_owner.push_back(motor_type);
+                bike.stock[brand][model] -= amount;
+                type.brand_owner.push_back(bike.brand[brand]);
             }
+            else
+                cout << "Not enough in stock!" << '\n';
         }
-        else
-            cout << "Out of stock!" << '\n';
         return;
     }
     else
-        cout << "Nonexistent command!" << '\n';
+        cout << "Out of stock!" << '\n';
+
     return;
 }
 
-void quick(int st, int dr, int a[])
+void quick(int st, int dr, std::vector<int> &a)
 {
 
     int pivot = a[(st + dr) / 2];
@@ -124,35 +115,18 @@ void quick(int st, int dr, int a[])
         quick(i, dr, a);
 }
 
-void print_brand(int n)
+void sort_price(std::vector<int> a)
 {
-    for (int i = 0; i < 4; ++i)
-    {
-        cout << "Enter " << n << " to select " << bike.brand[i] << '\n';
-        n++;
-    }
+    for (int i = 0; i < a.size(); ++i)
+        for (int j = 0; j < bike.price.size(); ++j)
+            for (int k = 0; k < bike.price[j].size(); ++k)
+                if (a[i] == bike.price[j][k])
+                    cout << bike.model[j][k] << " " << bike.price[j][k] << " euros" << '\n';
 }
 
-void print_model(int n, int brand)
+void print_info(int brand, int model)
 {
-    for (int i = 0; i < 2; ++i)
-    {
-        cout << "Enter " << n << " to select " << bike.model[brand * 2 - 2 + i] << '\n';
-        n++;
-    }
-}
-
-void sort_price(int a[])
-{
-    for (int i = 0; i < 8; ++i)
-        for (int j = 0; j < 8; ++j)
-            if (a[i] == bike.price[j])
-                cout << bike.model[j] << " " << bike.price[j] << " euros" << '\n';
-}
-
-void print_info(int brand, int nr)
-{
-    cout << "Our " << bike.brand[brand - 1] << " " << bike.model[nr] << " was made in " << bike.year[nr] << ", has a top speed of " << bike.speed[nr] << " and costs " << bike.price[nr] << " euros" << '\n';
+    cout << "Our " << bike.brand[brand] << " " << bike.model[brand][model] << " was made in " << bike.year[brand][model] << ", has a top speed of " << bike.speed[brand][model] << " and costs " << bike.price[brand][model] << " euros" << '\n';
 }
 
 void customer_info(int nr_client)
@@ -164,12 +138,88 @@ void customer_info(int nr_client)
         cout << "No existing clients!" << '\n';
 }
 
-void add_stock(int nr)
+void add_stock(int brand, int model)
 {
     int s;
     cout << "Amount: ";
-    cin >> s;
-    bike.stock[nr] += s;
+    std::cin >> s;
+    bike.stock[brand][model] += s;
+}
+
+void sort_list(std::vector<int> &a)
+{
+    for (int i = 0; i < bike.price.size(); ++i)
+        for (int j = 0; j < bike.price[i].size(); ++j)
+            a.push_back(bike.price[i][j]);
+}
+
+void add_existing_brand(int brand, Bikes &bike)
+{
+    string model, speed;
+
+    cout << "Model: " << '\n';
+    cin.ignore();
+    getline(cin, model);
+    bike.model[brand - 1].push_back(model);
+
+    cout << "Top speed: " << '\n';
+    getline(cin, speed);
+    bike.speed[brand - 1].push_back(speed);
+
+    int year, stock, price;
+
+    cout << "Year: " << '\n';
+    cin >> year;
+    bike.year[brand - 1].push_back(year);
+
+    cout << "Stock: " << '\n';
+    cin >> stock;
+    bike.stock[brand - 1].push_back(stock);
+
+    cout << "Price: " << '\n';
+    cin >> price;
+    bike.price[brand - 1].push_back(price);
+}
+
+void add_new_brand(Bikes &bike)
+{
+    cout << "Brand: " << '\n';
+    string brand, model, speed;
+    cin >> brand;
+    bike.brand.push_back(brand);
+
+    std::vector<string> temp;
+    cout << "Model: " << '\n';
+    cin.ignore();
+    getline(cin, model);
+    temp.push_back(model);
+    bike.model.push_back(temp);
+
+    temp.clear();
+    cout << "Top speed: " << '\n';
+    getline(cin, speed);
+    temp.push_back(speed);
+    bike.speed.push_back(temp);
+
+    int year, stock, price;
+    std::vector<int> temp1;
+    cout << "Year: " << '\n';
+    cin >> year;
+    temp1.push_back(year);
+    bike.year.push_back(temp1);
+
+    temp1.clear();
+    cout << "Stock: " << '\n';
+    cin >> stock;
+    temp1.push_back(stock);
+    bike.stock.push_back(temp1);
+
+    temp1.clear();
+    cout << "Price: " << '\n';
+    cin >> price;
+    temp1.push_back(price);
+    bike.price.push_back(temp1);
+    
 }
 void menu()
 {
@@ -191,10 +241,9 @@ void menu()
             if (command == 1)
             {
                 print_brand(1);
-                int input;
-                cin >> input;
-                select(input * 2 - 2, nr_client);
-                type.brand_owner[nr_client - 1] = bike.brand[input - 1];
+                int brand;
+                cin >> brand;
+                select(brand);
             }
             else if (command == 2)
             {
@@ -204,18 +253,14 @@ void menu()
                 cin >> brand;
                 print_model(1, brand);
                 cin >> model;
-                model--;
-                int nr = brand * 2 - 2 + model;
-                print_info(brand, nr);
+                model--, brand--;
+                print_info(brand, model);
             }
             else if (command == 3)
             {
-                int a[101] = {};
-
-                for (int i = 0; i < 8; ++i)
-                    a[i] = bike.price[i];
-
-                quick(0, 7, a);
+                std::vector<int> a;
+                sort_list(a);
+                quick(0, a.size() - 1, a);
                 sort_price(a);
             }
 
@@ -234,10 +279,11 @@ void menu()
                      << "1. Show client info" << '\n'
                      << "2. Add stock" << '\n'
                      << "3. Show stock" << '\n'
-                     << "4. Exit" << '\n';
+                     << "4. Add new bike" << '\n'
+                     << "5. Exit" << '\n';
                 cin >> command;
                 if (command == 1)
-                    customer_info(nr_client);
+                    customer_info(customer.name.size());
 
                 else if (command == 2)
                 {
@@ -246,9 +292,8 @@ void menu()
                     cin >> brand;
                     print_model(1, brand);
                     cin >> model;
-                    model--;
-                    int nr = brand * 2 - 2 + model;
-                    add_stock(nr);
+                    model--, brand--;
+                    add_stock(brand, model);
                 }
                 else if (command == 3)
                 {
@@ -257,11 +302,22 @@ void menu()
                     cin >> brand;
                     print_model(1, brand);
                     cin >> model;
-                    model--;
-                    int nr = brand * 2 - 2 + model;
-                    cout << bike.stock[nr] << '\n';
+                    model--, brand--;
+                    cout << bike.stock[brand][model] << '\n';
                 }
                 else if (command == 4)
+                {
+                    print_brand(1);
+                    cout << "Enter " << bike.brand.size() + 1 << " to add a new brand" << '\n';
+                    int brand;
+                    cin >> brand;
+                    if (brand <= bike.brand.size())
+                        add_existing_brand(brand, bike);
+                    else
+                        add_new_brand(bike);
+                }
+
+                else if (command == 5)
                     return;
             }
             else
